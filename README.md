@@ -30,6 +30,9 @@ You will have to register and the log in using username and password. After logg
 
 <ul>
 <li>200 OK with an array of todos </li>
+<li>401 Unauthorized (message: "Unauthorized")</li>
+<li>401 Unauthorized (message: "Invaid token")</li>
+
 </ul>
 
 ### GET /todos/?limit=x&page=y
@@ -49,6 +52,7 @@ You will have to register and the log in using username and password. After logg
 <ul>
 <li>200 OK with the specific todo </li>
 <li>401 Unauthorized when the user tries to get another user's todo </li>
+<li>401 Unauthorized (message: "Invaid token")</li>
 <li>404 Not Found (message: "Id is not of Mongo type and is invalid") when the Id is not even a Mongo valid id </li>
 <li>404 Not Found (message: "Todo not found") when the id is mongo-type but there is no Todo with that Id. </li>
 
