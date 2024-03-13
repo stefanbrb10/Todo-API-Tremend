@@ -7,18 +7,15 @@ const getTodos = async (req, res) => {
     try{
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 4;
+        if(page < 1 || limit < 1){
+            return res.status(400).json({message: "Invalid parameter values."});
+        }
         const startIndex = (page - 1) * limit; // where is the user currently
 
         const todos = await Todo.find({userId: req.user._id}).skip(startIndex).limit(limit);
         const total = await Todo.countDocuments({userId: req.user._id});
 
-        const pagination = {
-            currentPage: page,
-            totalPages: Math.ceil(total / limit),
-            totalItems: total
-        };
-
-        res.json({todos, pagination}); 
+        res.json({todos}); 
     } catch(err){
         res.status(500).json({message: err.message}); 
     }
@@ -66,6 +63,10 @@ const updateTodo = async (req, res) => {
     if(req.body.completed != null){
         res.todo.completed = req.body.completed;
     }
+    let anotherTodo = await Todo.findOne({ title: req.body.title });
+    if(anotherTodo){
+        return res.status(409).json({message: "A todo with this title already exists"});
+    }
     try{
         const updatedTodo = await res.todo.save();
         res.json(updatedTodo);
@@ -92,7 +93,7 @@ const deleteTodo = async (req, res) => {
 
 function getCurrentUser(req){
     const token = req.header('Cookie').replace('token=', '');
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET); 
     return decodedToken.userId;
 }
 
